@@ -10,14 +10,26 @@ const CASES = [
   {
     title: "The Last Bell", setting: "Wrenmere House", victim: "Eleanor Wren", difficulty: "Beginner",
     deck: "A stopped clock. A rain-locked manor. Five guests whose stories refuse to agree.",
+    caseHeading: "The death at Wrenmere House",
     story: "At 9:24 p.m., during a storm-bound charity auction preview, Eleanor Wren was found dead in the Conservatory. A toppled mantel clock had stopped at 9:20. Beside her lay a bloodied brass candlestick. Five guests had moved through the east wing in the forty minutes before the alarm. Each person was seen once, in a different room, at a different time, carrying a different object.",
     suspects: [
-      ["Felix Vale", "The family solicitor"], ["Celia Frost", "The estranged niece"],
-      ["Dorian Pike", "The art dealer"], ["Mara Quinn", "The head gardener"],
-      ["Iris Bell", "The society columnist"]
+      ["Felix Vale", "The family solicitor", "Eleanor planned to replace him after an audit exposed missing records."],
+      ["Celia Frost", "The estranged niece", "A new will threatened to leave her with nothing but the house's debts."],
+      ["Dorian Pike", "The art dealer", "Eleanor had discovered that his prized miniature was a forgery."],
+      ["Mara Quinn", "The head gardener", "Eleanor intended to sell the glasshouse and dismiss the estate staff."],
+      ["Iris Bell", "The society columnist", "Eleanor possessed letters that could end Iris's career and marriage."]
     ],
     rooms: ["Library", "Kitchen", "Gallery", "Conservatory", "Billiard Room"],
-    items: ["Silver flask", "Torn letter", "Pocket watch", "Brass candlestick", "Blue scarf"]
+    items: ["Silver flask", "Torn letter", "Pocket watch", "Brass candlestick", "Blue scarf"],
+    inspectorNote: "No one entered or left the east wing during the relevant period. The servants agree on the five arrival times, but not on who appeared where. One suspect insists the stopped clock is a distraction. It is not.",
+    solutionHeading: "Mara Quinn rang the last bell",
+    deductionPath: [
+      "Clues 1-4 place the Kitchen at 9:00, the Gallery at 9:10, the Conservatory at 9:20, and the Billiard Room at 9:30. The Library must therefore be the 8:50 room.",
+      "Clues 5 and 6 put Dorian and the pocket watch in the Gallery at 9:10.",
+      "Clue 7 puts Mara at 9:20, which is the Conservatory slot. Clue 8 then puts Iris at 9:30.",
+      "Clue 9 puts Celia at 9:00, leaving Felix at 8:50. Clues 10-12 place the flask at 8:50, the letter at 9:00, and the scarf at 9:30.",
+      "The only unused object at 9:20 is the brass candlestick. Mara therefore matches the room, time, and weapon fixed by the crime scene."
+    ]
   },
   {
     title: "A Toast to Silence", setting: "The Lantern Club", victim: "Sebastian Rook", difficulty: "Beginner",
@@ -228,12 +240,16 @@ function announce(message) {
 }
 
 function chapterState(id) {
-  if (!state.chapters[id]) state.chapters[id] = { cells: {}, solved: false, attempts: 0 };
+  if (!state.chapters[id]) state.chapters[id] = { cells: {}, solved: false, attempts: 0, reasoning: "" };
   return state.chapters[id];
 }
 
 function initials(name) {
   return name.split(" ").map(x => x[0]).join("").slice(0, 2);
+}
+
+function escapeHTML(value = "") {
+  return value.replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
 }
 
 function optionList(values, label) {
@@ -258,6 +274,22 @@ function gridMarkup(id, title, rows, cols, gridKey) {
   </section>`;
 }
 
+function expandedSolutionMarkup(data) {
+  return `<div id="solution" class="solution expanded-solution ${chapterState(data.id).solved ? "" : "is-hidden"}">
+    <p class="solution-label">Solution</p>
+    <h4>${data.solutionHeading}</h4>
+    <p>${data.suspects[3][0]} was in the ${data.rooms[3]} at 9:20 p.m. carrying the ${data.items[3].toLowerCase()}. ${data.suspects[3][0]} killed ${data.victim}.</p>
+    <div class="timeline-scroll">
+      <table class="timeline-table">
+        <thead><tr><th scope="col">Time</th><th scope="col">Suspect</th><th scope="col">Room</th><th scope="col">Object</th></tr></thead>
+        <tbody>${data.suspects.map((suspect, index) => `<tr ${index === 3 ? 'class="culprit-row"' : ""}><td>${TIMES[index].replace(" p.m.", "")}</td><td>${suspect[0]}</td><td>${data.rooms[index]}</td><td>${data.items[index]}</td></tr>`).join("")}</tbody>
+      </table>
+    </div>
+    <h5>Deduction path</h5>
+    <ol class="deduction-path">${data.deductionPath.map(step => `<li>${step}</li>`).join("")}</ol>
+  </div>`;
+}
+
 function renderChapter(id, focus = false) {
   currentChapter = id;
   location.hash = `chapter-${id}`;
@@ -265,6 +297,7 @@ function renderChapter(id, focus = false) {
   const partIndex = partFor(id);
   const part = PARTS[partIndex];
   const cState = chapterState(id);
+  const isExpandedChapter = id === 1;
   const clues = cluesFor(data);
   const hints = hintsFor(data);
   document.getElementById("top-part").textContent = part.title;
@@ -285,9 +318,18 @@ function renderChapter(id, focus = false) {
     </header>
 
     <section class="section intro-copy" aria-labelledby="brief-title">
-      <div class="section-heading"><span class="section-index">01</span><h3 id="brief-title">The case</h3></div>
+      <div class="section-heading"><span class="section-index">01</span><h3 id="brief-title">${data.caseHeading || "The case"}</h3></div>
       <p>${data.story}</p>
-      <p>Your task is to match every suspect with one room, one arrival time, and one object. The killer is the person in the crime room at 9:20 p.m. with the murder weapon.</p>
+      ${isExpandedChapter ? `<div class="assignment-panel">
+        <h4>Your assignment</h4>
+        <p>Use the clues and grids to match every suspect with one room, one arrival time, and one object. Then name the killer. There is exactly one solution.</p>
+        <dl class="case-reference">
+          <div><dt>Arrival times</dt><dd>${TIMES.join(" · ")}</dd></div>
+          <div><dt>Rooms</dt><dd>${data.rooms.join(" · ")}</dd></div>
+          <div><dt>Objects</dt><dd>${data.items.join(" · ")}</dd></div>
+        </dl>
+        <div class="marking-guide"><h4>How to mark the grids</h4><p>Place an <strong>X</strong> where a pairing cannot be true. Place an <strong>O</strong> where a pairing must be true. Each row and column receives exactly one O. Carry confirmed matches across the other grids.</p><p><strong>Important:</strong> Times describe when each guest was seen entering a room, not how long the guest remained there.</p></div>
+      </div>` : `<p>Your task is to match every suspect with one room, one arrival time, and one object. The killer is the person in the crime room at 9:20 p.m. with the murder weapon.</p>`}
       <div class="facts-grid">
         <div class="fact"><span>Crime room</span><strong>${data.rooms[3]}</strong></div>
         <div class="fact"><span>Time of death</span><strong>9:20 p.m.</strong></div>
@@ -296,12 +338,15 @@ function renderChapter(id, focus = false) {
     </section>
 
     <section class="section" aria-labelledby="cast-title">
-      <div class="section-heading"><span class="section-index">02</span><h3 id="cast-title">The suspects</h3></div>
-      <div class="cast-grid">${data.suspects.map(([name, role]) => `<article class="suspect-card" data-initials="${initials(name)}"><h4>${name}</h4><p>${role}</p></article>`).join("")}</div>
+      <div class="section-heading"><span class="section-index">02</span><h3 id="cast-title">${isExpandedChapter ? "Five people with reasons to lie" : "The suspects"}</h3></div>
+      ${isExpandedChapter ? `<p class="section-intro">Eleanor had collected enemies as readily as art. The motives below establish atmosphere, but the solution depends only on the twelve clues.</p>
+      <div class="cast-table-wrap"><table class="cast-table"><thead><tr><th scope="col">Suspect</th><th scope="col">Connection</th><th scope="col">Possible motive</th></tr></thead><tbody>${data.suspects.map(([name, role, motive]) => `<tr><th scope="row">${name}</th><td>${role}</td><td>${motive}</td></tr>`).join("")}</tbody></table></div>
+      <aside class="inspector-note"><span>Inspector's note</span><p>${data.inspectorNote}</p></aside>` : `<div class="cast-grid">${data.suspects.map(([name, role]) => `<article class="suspect-card" data-initials="${initials(name)}"><h4>${name}</h4><p>${role}</p></article>`).join("")}</div>`}
     </section>
 
     <section class="section" aria-labelledby="clues-title">
       <div class="section-heading"><span class="section-index">03</span><h3 id="clues-title">The twelve clues</h3></div>
+      ${isExpandedChapter ? `<p class="section-intro">Read carefully. The wording is exact: immediately before or after means a ten-minute difference.</p>` : ""}
       <div class="clue-grid">${clues.map((clue, i) => `<article class="clue"><b>${i + 1}</b><p>${clue}</p></article>`).join("")}</div>
     </section>
 
@@ -326,12 +371,13 @@ function renderChapter(id, focus = false) {
             <div class="field"><label for="accuse-time">The time</label><select id="accuse-time">${optionList(TIMES, "a time")}</select></div>
             <div class="field"><label for="accuse-item">The weapon</label><select id="accuse-item">${optionList(data.items, "an object")}</select></div>
           </div>
+          ${isExpandedChapter ? `<div class="reasoning-field"><label for="reasoning">Explain your reasoning</label><textarea id="reasoning" rows="6" placeholder="Which clues fixed the timeline? What eliminated the other suspects?">${escapeHTML(cState.reasoning || "")}</textarea><span>Your notes are saved on this device.</span></div>` : ""}
           <div class="form-actions"><button class="secondary-button" type="submit">Check accusation</button><button class="outline-button" id="reveal-answer" type="button">Reveal after an attempt</button></div>
           <p id="feedback" class="feedback" role="status"></p>
-          <div id="solution" class="solution ${cState.solved ? "" : "is-hidden"}">
+          ${isExpandedChapter ? expandedSolutionMarkup(data) : `<div id="solution" class="solution ${cState.solved ? "" : "is-hidden"}">
             <h4>${data.suspects[3][0]} committed the murder.</h4>
             <p>${data.suspects[3][0]} was in the ${data.rooms[3]} at 9:20 p.m. carrying the ${data.items[3].toLowerCase()}. The full timeline is ${data.suspects.map((s, i) => `${TIMES[i].replace(" p.m.", "")}: ${s[0]} in the ${data.rooms[i]} with the ${data.items[i].toLowerCase()}`).join("; ")}.</p>
-          </div>
+          </div>`}
         </form>
         <aside class="hints">
           <h4>Hint ladder</h4><p>Reveal only what you need.</p>
@@ -371,9 +417,15 @@ function bindChapterEvents(data) {
 
   document.getElementById("reset-grid").addEventListener("click", () => {
     if (!confirm("Clear every mark and attempt for this case?")) return;
-    state.chapters[currentChapter] = { cells: {}, solved: false, attempts: 0 };
+    state.chapters[currentChapter] = { cells: {}, solved: false, attempts: 0, reasoning: "" };
     saveState("This case has been cleared.");
     renderChapter(currentChapter);
+  });
+
+  const reasoning = document.getElementById("reasoning");
+  if (reasoning) reasoning.addEventListener("input", () => {
+    chapterState(currentChapter).reasoning = reasoning.value;
+    saveState();
   });
 
   document.querySelectorAll(".hint-item button").forEach(button => {
@@ -392,7 +444,7 @@ function bindChapterEvents(data) {
     const guess = ["accuse-person", "accuse-room", "accuse-time", "accuse-item"].map(id => document.getElementById(id).value);
     const feedback = document.getElementById("feedback");
     const cState = chapterState(currentChapter);
-    cState.attempts += 1;
+    cState.attempts = (cState.attempts || 0) + 1;
     if (guess.some(x => !x)) {
       feedback.className = "feedback error";
       feedback.textContent = "Complete all four fields before checking your accusation.";
@@ -401,6 +453,7 @@ function bindChapterEvents(data) {
       feedback.className = "feedback success";
       feedback.textContent = "Case closed. Every part of your accusation is correct.";
       document.getElementById("solution").classList.remove("is-hidden");
+      document.querySelector(".case-complete").textContent = "Case solved";
       announce(`Chapter ${currentChapter} solved.`);
     } else {
       const correct = guess.filter((value, i) => value === answer[i]).length;
@@ -421,6 +474,7 @@ function bindChapterEvents(data) {
     }
     cState.solved = true;
     document.getElementById("solution").classList.remove("is-hidden");
+    document.querySelector(".case-complete").textContent = "Case solved";
     feedback.className = "feedback success";
     feedback.textContent = "Solution revealed. Compare it with your grid and reasoning.";
     saveState("Solution revealed and case marked complete.");
