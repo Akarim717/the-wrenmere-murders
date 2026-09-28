@@ -272,12 +272,15 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 .case-stamp { align-self: stretch; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem; border: 1px solid var(--stone); border-top: 7px solid var(--olive); background: var(--paper); box-shadow: 0 14px 45px rgba(8,42,61,.08); }
 .case-stamp span { color: var(--deep-olive); font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .case-stamp strong { margin-top: .25rem; color: var(--ink); font-family: var(--serif); font-size: 1.35rem; }
+.case-stamp em { align-self: flex-start; margin-top: .75rem; padding: .3rem .5rem; background: var(--mist); color: var(--deep-olive); font-size: .7rem; font-style: normal; font-weight: 900; letter-spacing: .04em; line-height: 1.3; text-transform: uppercase; }
 .case-stamp small { margin-top: .8rem; color: #64706c; }
 .section { margin: 4.5rem 0 0; scroll-margin-top: 90px; }
 .section-heading { display: flex; align-items: baseline; gap: .75rem; margin-bottom: 1.25rem; }
 .section-index { color: var(--amber); font-size: .8rem; font-weight: 900; }
 .section h3 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.6rem); line-height: 1.1; }
 .intro-copy { max-width: 72ch; }
+.case-objective { margin-top: 1.15rem; padding-left: 1rem; border-left: 5px solid var(--amber); }
+.case-objective strong { color: var(--ink); }
 .facts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 1.5rem; background: var(--stone); border: 1px solid var(--stone); }
 .fact { min-height: 120px; padding: 1rem; background: var(--paper); }
 .fact span { color: var(--deep-olive); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
