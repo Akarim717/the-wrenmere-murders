@@ -274,6 +274,57 @@ function gridMarkup(id, title, rows, cols, gridKey) {
   </section>`;
 }
 
+function tutorialMarkup() {
+  const people = ["Ada Reed", "Bram Cole", "Cora Finch"];
+  const rooms = ["Study", "Kitchen", "Gallery"];
+  return `<section class="section tutorial-section" aria-labelledby="tutorial-title">
+    <div class="section-heading"><span class="section-index">02</span><h3 id="tutorial-title">How the game works</h3></div>
+    <p class="tutorial-lead">You are not guessing the murderer. You are reconstructing a hidden table: who entered which room, at what time, carrying which object. When one complete record matches the crime room, time, and weapon, the killer emerges.</p>
+
+    <ol class="play-loop" aria-label="Five steps for solving a case">
+      <li><span>1</span><div><strong>Read for facts</strong><p>Some clues give a direct match. Others compare two entries, such as ten minutes earlier or later.</p></div></li>
+      <li><span>2</span><div><strong>Mark the grids</strong><p>Use <b class="mark-sample mark-o">O</b> for a pairing that must be true and <b class="mark-sample mark-x">X</b> for one that cannot be true.</p></div></li>
+      <li><span>3</span><div><strong>Complete the row and column</strong><p>Every option is used once. After placing an O, every other square in that row and column becomes X.</p></div></li>
+      <li><span>4</span><div><strong>Carry facts across</strong><p>If Ada has the lantern and the lantern was in the Study, Ada must have been in the Study. Record that result in the people-by-room grid.</p></div></li>
+      <li><span>5</span><div><strong>Match the crime facts</strong><p>Find the person whose room, time, and object match the fixed evidence, then submit all four parts of the accusation.</p></div></li>
+    </ol>
+
+    <div class="practice-panel">
+      <div class="practice-copy">
+        <p class="practice-kicker">Practice file</p>
+        <h4>Three guests and three rooms</h4>
+        <p>Use these clues to complete the miniature grid. Select a square to cycle from blank to X to O.</p>
+        <ol class="practice-clues">
+          <li>Bram Cole was seen in the Gallery.</li>
+          <li>Ada Reed was not in the Kitchen.</li>
+          <li>Cora Finch was not in the Study.</li>
+        </ol>
+        <p class="practice-tip"><strong>Elimination matters:</strong> once Bram takes the Gallery, Ada and Cora cannot be there. The two negative clues settle the remaining rooms.</p>
+      </div>
+      <div class="practice-workspace">
+        <div class="practice-grid-scroll">
+          <table class="practice-grid">
+            <thead><tr><th scope="col">Guest</th>${rooms.map(room => `<th scope="col">${room}</th>`).join("")}</tr></thead>
+            <tbody>${people.map((person, row) => `<tr><th scope="row">${person}</th>${rooms.map((room, col) => `<td><button class="practice-cell" type="button" data-row="${row}" data-col="${col}" data-state="blank" aria-label="${person} in ${room}: blank"></button></td>`).join("")}</tr>`).join("")}</tbody>
+          </table>
+        </div>
+        <div class="practice-actions">
+          <button class="secondary-button" id="check-practice" type="button">Check practice grid</button>
+          <button class="outline-button" id="show-practice" type="button">Show worked answer</button>
+          <button class="text-button" id="reset-practice" type="button">Reset</button>
+        </div>
+        <p id="practice-feedback" class="practice-feedback" role="status">Aim for one O in every row and column.</p>
+      </div>
+    </div>
+
+    <div class="deduction-example" aria-label="Example of carrying a deduction across grids">
+      <span>Example chain</span>
+      <strong>Ada + lantern</strong><i aria-hidden="true">→</i><strong>lantern + Study</strong><i aria-hidden="true">→</i><strong>Ada + Study</strong>
+      <p>Two confirmed pairings create a third. This is how separate grids work together.</p>
+    </div>
+  </section>`;
+}
+
 function expandedSolutionMarkup(data) {
   return `<div id="solution" class="solution expanded-solution ${chapterState(data.id).solved ? "" : "is-hidden"}">
     <p class="solution-label">Solution</p>
@@ -322,7 +373,7 @@ function renderChapter(id, focus = false) {
       <p>${data.story}</p>
       ${isExpandedChapter ? `<div class="assignment-panel">
         <h4>Your assignment</h4>
-        <p>Use the clues and grids to match every suspect with one room, one arrival time, and one object. Then name the killer. There is exactly one solution.</p>
+        <p>Use the clues and grids to match every suspect with one room, one arrival time, and one object. Then name the killer. There is exactly one solution. If logic grids are new to you, complete the short practice file below before reading the case clues.</p>
         <dl class="case-reference">
           <div><dt>Arrival times</dt><dd>${TIMES.join(" · ")}</dd></div>
           <div><dt>Rooms</dt><dd>${data.rooms.join(" · ")}</dd></div>
@@ -337,21 +388,23 @@ function renderChapter(id, focus = false) {
       </div>
     </section>
 
+    ${isExpandedChapter ? tutorialMarkup() : ""}
+
     <section class="section" aria-labelledby="cast-title">
-      <div class="section-heading"><span class="section-index">02</span><h3 id="cast-title">${isExpandedChapter ? "Five people with reasons to lie" : "The suspects"}</h3></div>
+      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "03" : "02"}</span><h3 id="cast-title">${isExpandedChapter ? "Five people with reasons to lie" : "The suspects"}</h3></div>
       ${isExpandedChapter ? `<p class="section-intro">Eleanor had collected enemies as readily as art. The motives below establish atmosphere, but the solution depends only on the twelve clues.</p>
       <div class="cast-table-wrap"><table class="cast-table"><thead><tr><th scope="col">Suspect</th><th scope="col">Connection</th><th scope="col">Possible motive</th></tr></thead><tbody>${data.suspects.map(([name, role, motive]) => `<tr><th scope="row">${name}</th><td>${role}</td><td>${motive}</td></tr>`).join("")}</tbody></table></div>
       <aside class="inspector-note"><span>Inspector's note</span><p>${data.inspectorNote}</p></aside>` : `<div class="cast-grid">${data.suspects.map(([name, role]) => `<article class="suspect-card" data-initials="${initials(name)}"><h4>${name}</h4><p>${role}</p></article>`).join("")}</div>`}
     </section>
 
     <section class="section" aria-labelledby="clues-title">
-      <div class="section-heading"><span class="section-index">03</span><h3 id="clues-title">The twelve clues</h3></div>
+      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "04" : "03"}</span><h3 id="clues-title">The twelve clues</h3></div>
       ${isExpandedChapter ? `<p class="section-intro">Read carefully. The wording is exact: immediately before or after means a ten-minute difference.</p>` : ""}
       <div class="clue-grid">${clues.map((clue, i) => `<article class="clue"><b>${i + 1}</b><p>${clue}</p></article>`).join("")}</div>
     </section>
 
     <section class="section" aria-labelledby="grid-title">
-      <div class="section-heading"><span class="section-index">04</span><h3 id="grid-title">Your deduction grid</h3></div>
+      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "05" : "04"}</span><h3 id="grid-title">Your deduction grid</h3></div>
       <div class="tool-intro"><p>Select a square to cycle between blank, X, and O. Your work is saved on this device.</p><button class="reset-button" id="reset-grid" type="button">Clear this case</button></div>
       <div class="grids">
         ${gridMarkup(id, "Suspects by room", data.suspects.map(s => s[0]), data.rooms, "people-rooms")}
@@ -362,7 +415,7 @@ function renderChapter(id, focus = false) {
     </section>
 
     <section class="section" aria-labelledby="accuse-title">
-      <div class="section-heading"><span class="section-index">05</span><h3 id="accuse-title">Make your accusation</h3></div>
+      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "06" : "05"}</span><h3 id="accuse-title">Make your accusation</h3></div>
       <div class="accusation-layout">
         <form id="accusation-form" class="accusation-form">
           <div class="field-grid">
@@ -427,6 +480,47 @@ function bindChapterEvents(data) {
     chapterState(currentChapter).reasoning = reasoning.value;
     saveState();
   });
+
+  const practiceCells = [...document.querySelectorAll(".practice-cell")];
+  if (practiceCells.length) {
+    const expected = ["o", "x", "x", "x", "x", "o", "x", "o", "x"];
+    const feedback = document.getElementById("practice-feedback");
+    const setPracticeCell = (cell, next) => {
+      cell.dataset.state = next;
+      cell.textContent = next === "x" ? "×" : next === "o" ? "○" : "";
+      cell.setAttribute("aria-label", cell.getAttribute("aria-label").replace(/: (blank|x|o)$/, `: ${next}`));
+    };
+
+    practiceCells.forEach(cell => cell.addEventListener("click", () => {
+      const sequence = { blank: "x", x: "o", o: "blank" };
+      setPracticeCell(cell, sequence[cell.dataset.state]);
+      feedback.className = "practice-feedback";
+      feedback.textContent = "Keep going. Aim for one O in every row and column.";
+    }));
+
+    document.getElementById("check-practice").addEventListener("click", () => {
+      const correct = practiceCells.filter((cell, index) => cell.dataset.state === expected[index]).length;
+      if (correct === expected.length) {
+        feedback.className = "practice-feedback success";
+        feedback.textContent = "Practice solved. Bram takes the Gallery, Ada takes the Study, and Cora takes the Kitchen.";
+      } else {
+        feedback.className = "practice-feedback error";
+        feedback.textContent = `${correct} of 9 squares are correct. Use the confirmed Gallery match first, then eliminate its row and column.`;
+      }
+    });
+
+    document.getElementById("show-practice").addEventListener("click", () => {
+      practiceCells.forEach((cell, index) => setPracticeCell(cell, expected[index]));
+      feedback.className = "practice-feedback success";
+      feedback.textContent = "Worked answer shown. Notice that every row and every column contains exactly one O.";
+    });
+
+    document.getElementById("reset-practice").addEventListener("click", () => {
+      practiceCells.forEach(cell => setPracticeCell(cell, "blank"));
+      feedback.className = "practice-feedback";
+      feedback.textContent = "Aim for one O in every row and column.";
+    });
+  }
 
   document.querySelectorAll(".hint-item button").forEach(button => {
     button.addEventListener("click", () => {
