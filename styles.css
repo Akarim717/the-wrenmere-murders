@@ -249,13 +249,16 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   align-items: end;
   margin-bottom: 3.2rem;
 }
+.chapter-banner { position: relative; grid-column: 1 / -1; width: 100%; height: clamp(260px, 35vw, 430px); margin: .25rem 0 0; overflow: hidden; border: 1px solid #a8a795; background: var(--ink); box-shadow: var(--shadow); }
+.chapter-banner::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 58%, rgba(8,42,61,.28)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+.chapter-banner img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .chapter-number { margin: 0 0 .65rem; color: var(--deep-amber); font-size: .82rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
 .chapter h2 {
   margin: 0;
-  max-width: 11ch;
+  max-width: 12ch;
   color: var(--ink);
   font-family: var(--serif);
-  font-size: clamp(3.1rem, 8vw, 7rem);
+  font-size: clamp(3.1rem, 5vw, 5.7rem);
   letter-spacing: -.055em;
   line-height: .88;
   overflow-wrap: normal;
@@ -417,6 +420,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   .reading-shell { margin-left: 0; }
   .icon-button { display: inline-grid; place-items: center; }
   .chapter-hero { grid-template-columns: 1fr; }
+  .chapter-banner { grid-column: auto; height: clamp(240px, 56vw, 360px); }
   .facts-grid { grid-template-columns: 1fr; }
   .fact { min-height: 0; }
   .cast-grid { grid-template-columns: 1fr 1fr; }
@@ -431,7 +435,8 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   .cover h1 { font-size: clamp(3.6rem, 17vw, 5.4rem); }
   .cover-shade { background: linear-gradient(0deg, rgba(4,18,27,.98) 0%, rgba(4,18,27,.72) 65%, rgba(4,18,27,.28) 100%); }
   .chapter { padding: 2rem 1rem 4rem; }
-  .chapter h2 { font-size: clamp(3rem, 15vw, 5rem); }
+  .chapter h2 { font-size: clamp(3rem, 12vw, 4rem); }
+  .chapter-banner { height: 260px; }
   .cast-grid, .clue-grid, .field-grid { grid-template-columns: 1fr; }
   .play-loop { grid-template-columns: 1fr; }
   .case-reference > div { grid-template-columns: 1fr; }

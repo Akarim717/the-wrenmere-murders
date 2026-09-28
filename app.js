@@ -366,6 +366,9 @@ function renderChapter(id, focus = false) {
         <strong>${data.setting}</strong>
         <small>${data.difficulty} · Approx. 20-35 minutes · Unique solution</small>
       </aside>
+      <figure class="chapter-banner">
+        <img src="assets/chapters/chapter-${String(id).padStart(2, "0")}.jpg" alt="Atmospheric illustration of ${data.setting} for ${data.title}." width="1600" height="900" ${id === 1 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+      </figure>
     </header>
 
     <section class="section intro-copy" aria-labelledby="brief-title">
