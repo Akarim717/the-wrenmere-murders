@@ -1,4 +1,26 @@
 const TIMES = ["8:50 p.m.", "9:00 p.m.", "9:10 p.m.", "9:20 p.m.", "9:30 p.m."];
+const CASE_TIMES = [
+  TIMES,
+  ["11:30 p.m.", "11:40 p.m.", "11:50 p.m.", "12:00 a.m.", "12:10 a.m."],
+  ["6:50 p.m.", "7:00 p.m.", "7:10 p.m.", "7:20 p.m.", "7:30 p.m."],
+  ["9:50 p.m.", "10:00 p.m.", "10:10 p.m.", "10:20 p.m.", "10:30 p.m."],
+  ["7:50 p.m.", "8:00 p.m.", "8:10 p.m.", "8:20 p.m.", "8:30 p.m."],
+  ["5:40 a.m.", "5:50 a.m.", "6:00 a.m.", "6:10 a.m.", "6:20 a.m."],
+  ["7:10 p.m.", "7:20 p.m.", "7:30 p.m.", "7:40 p.m.", "7:50 p.m."],
+  ["8:30 p.m.", "8:40 p.m.", "8:50 p.m.", "9:00 p.m.", "9:10 p.m."],
+  ["11:40 p.m.", "11:50 p.m.", "12:00 a.m.", "12:10 a.m.", "12:20 a.m."],
+  ["9:40 p.m.", "9:50 p.m.", "10:00 p.m.", "10:10 p.m.", "10:20 p.m."],
+  ["9:30 p.m.", "9:40 p.m.", "9:50 p.m.", "10:00 p.m.", "10:10 p.m."],
+  ["8:20 p.m.", "8:30 p.m.", "8:40 p.m.", "8:50 p.m.", "9:00 p.m."],
+  TIMES,
+  ["9:40 p.m.", "9:50 p.m.", "10:00 p.m.", "10:10 p.m.", "10:20 p.m."],
+  ["10:50 p.m.", "11:00 p.m.", "11:10 p.m.", "11:20 p.m.", "11:30 p.m."],
+  ["5:40 p.m.", "5:50 p.m.", "6:00 p.m.", "6:10 p.m.", "6:20 p.m."],
+  ["11:30 p.m.", "11:40 p.m.", "11:50 p.m.", "12:00 a.m.", "12:10 a.m."],
+  ["3:10 p.m.", "3:20 p.m.", "3:30 p.m.", "3:40 p.m.", "3:50 p.m."],
+  ["9:20 p.m.", "9:30 p.m.", "9:40 p.m.", "9:50 p.m.", "10:00 p.m."],
+  ["9:40 p.m.", "9:50 p.m.", "10:00 p.m.", "10:10 p.m.", "10:20 p.m."]
+];
 const PARTS = [
   { title: "Part I - House of Secrets", range: [1, 5] },
   { title: "Part II - Beyond the Gates", range: [6, 10] },
@@ -185,36 +207,154 @@ const CASES = [
   }
 ].map((entry, index) => ({ ...entry, id: index + 1 }));
 
+const SOLUTION_PATTERNS = {
+  classic: { rooms: [0, 1, 2, 3, 4], times: [0, 1, 2, 3, 4], items: [0, 1, 2, 3, 4] },
+  alibi: { rooms: [2, 4, 1, 0, 3], times: [1, 3, 0, 4, 2], items: [4, 0, 3, 1, 2] },
+  trail: { rooms: [3, 0, 4, 2, 1], times: [4, 1, 3, 0, 2], items: [1, 3, 0, 4, 2] },
+  sequence: { rooms: [1, 3, 0, 4, 2], times: [2, 0, 4, 1, 3], items: [2, 4, 1, 0, 3] },
+  contradiction: { rooms: [4, 2, 3, 1, 0], times: [3, 4, 1, 2, 0], items: [3, 2, 4, 0, 1] }
+};
+
+const CASE_PROFILES = [
+  { pattern: "classic", target: 3, caseType: "Classic deduction · Murder", evidenceHeading: "The twelve clues", evidenceIntro: "Build the timeline first, then carry each confirmed match across the other grids.", personLabel: "The killer", placeLabel: "Crime room", timeLabel: "Time of death", itemLabel: "Murder weapon", submissionHeading: "Make your accusation", resultVerb: "committed the murder" },
+  { pattern: "alibi", target: 2, caseType: "Broken alibi · Murder", evidenceHeading: "Five alibis, seven records", evidenceIntro: "The signed room register is reliable. The spoken alibis are not. Reconstruct the records before deciding whose story breaks.", personLabel: "The liar", placeLabel: "Unaccounted room", timeLabel: "Critical time", itemLabel: "Concealed object", submissionHeading: "Expose the false alibi", resultVerb: "gave the fatal false alibi" },
+  { pattern: "trail", target: 4, caseType: "Object trail · Disappearance", evidenceHeading: "The abandoned trail", evidenceIntro: "Trace each object through the hall, then connect it to the person who carried it.", personLabel: "The accomplice", placeLabel: "Last-seen room", timeLabel: "Vanishing time", itemLabel: "Object left behind", submissionHeading: "Explain the disappearance", resultVerb: "helped stage the disappearance" },
+  { pattern: "contradiction", target: 0, caseType: "Contradiction case · Arson cover-up", evidenceHeading: "Statements under caution", evidenceIntro: "Each statement is individually true, but together they expose where the fire was used to hide an earlier crime.", personLabel: "The culprit", placeLabel: "Origin room", timeLabel: "Fire-setting time", itemLabel: "Planted evidence", submissionHeading: "Name the culprit", resultVerb: "set the fire to conceal the crime" },
+  { pattern: "sequence", target: 1, caseType: "Movement sequence · Attempted poisoning", evidenceHeading: "Glasshouse movement log", evidenceIntro: "Establish the order of entry before matching the equipment carried through each zone.", personLabel: "The saboteur", placeLabel: "Contaminated zone", timeLabel: "Exposure time", itemLabel: "Altered equipment", submissionHeading: "Identify the saboteur", resultVerb: "tampered with the glasshouse equipment" },
+  { pattern: "classic", target: 1, caseType: "Tide-table deduction · Murder", evidenceHeading: "The keeper's log", evidenceIntro: "Use the tide bell and causeway sightings as fixed anchors; the objects resolve the remaining movements.", personLabel: "The killer", placeLabel: "Crime room", timeLabel: "Time of death", itemLabel: "Murder weapon", submissionHeading: "Make your accusation", resultVerb: "committed the murder" },
+  { pattern: "sequence", target: 3, caseType: "Cue sequence · Attempted murder", evidenceHeading: "The prompt-book record", evidenceIntro: "Stage cues happened in a fixed order. Match each cue to a room, company member, and prop.", personLabel: "The saboteur", placeLabel: "Rigged room", timeLabel: "Trigger time", itemLabel: "Rigged prop", submissionHeading: "Identify the saboteur", resultVerb: "rigged the fatal stage cue" },
+  { pattern: "contradiction", target: 4, caseType: "Provenance puzzle · Murder", evidenceHeading: "The provenance contradictions", evidenceIntro: "The photographs establish rooms; the catalogue times and objects reveal which provenance story cannot stand.", personLabel: "The forger", placeLabel: "Exchange room", timeLabel: "Exchange time", itemLabel: "Forged evidence", submissionHeading: "Expose the forger", resultVerb: "made the fatal exchange" },
+  { pattern: "trail", target: 0, caseType: "Message trail · Interception", evidenceHeading: "The telegram's route", evidenceIntro: "Follow the parcels and office stamps to learn who intercepted the message before it reached its recipient.", personLabel: "The interceptor", placeLabel: "Intercept room", timeLabel: "Intercept time", itemLabel: "Taken message", submissionHeading: "Trace the interception", resultVerb: "intercepted the telegram" },
+  { pattern: "alibi", target: 4, caseType: "Locked-house alibis · Murder", evidenceHeading: "Alibis in the snow", evidenceIntro: "No footprints crossed the grounds. The interior register and carried objects expose the only impossible alibi.", personLabel: "The killer", placeLabel: "Crime room", timeLabel: "Time of death", itemLabel: "Murder weapon", submissionHeading: "Break the locked-house alibi", resultVerb: "committed the murder" },
+  { pattern: "contradiction", target: 2, caseType: "Impossible theft · Locked rooms", evidenceHeading: "The key ledger", evidenceIntro: "Every door was locked, but the key ledger, room sequence, and display objects cannot all support the same story.", personLabel: "The thief", placeLabel: "Removal room", timeLabel: "Removal time", itemLabel: "Stolen object", submissionHeading: "Solve the impossible theft", resultVerb: "removed the display object" },
+  { pattern: "trail", target: 1, caseType: "Marginalia trail · Hidden confession", evidenceHeading: "Clues between the lines", evidenceIntro: "Match the abandoned reading objects to their sections and times; the owner of the final trace found the confession first.", personLabel: "The suppressor", placeLabel: "Discovery room", timeLabel: "Discovery time", itemLabel: "Hidden evidence", submissionHeading: "Recover the confession", resultVerb: "attempted to suppress the confession" },
+  { pattern: "sequence", target: 0, caseType: "Mechanical sequence · Murder", evidenceHeading: "The stopped-clock sequence", evidenceIntro: "The clocks stopped in order, not together. Rebuild that sequence before assigning tools and visitors.", personLabel: "The killer", placeLabel: "Crime room", timeLabel: "True death time", itemLabel: "Murder weapon", submissionHeading: "Correct the false timeline", resultVerb: "committed the murder" },
+  { pattern: "alibi", target: 3, caseType: "Symbolic alibis · Poisoning", evidenceHeading: "The language of flowers", evidenceIntro: "Each guest used a flower as an alibi. Match the tokens to paths and times to discover which symbol was planted.", personLabel: "The poisoner", placeLabel: "Poisoning site", timeLabel: "Poisoning time", itemLabel: "Planted token", submissionHeading: "Identify the poisoner", resultVerb: "planted the poisonous token" },
+  { pattern: "sequence", target: 4, caseType: "Carriage sequence · Disappearance", evidenceHeading: "The conductor's sequence", evidenceIntro: "The train never stopped. Reconstruct the carriage movements to find who helped the missing passenger change identities.", personLabel: "The accomplice", placeLabel: "Switching carriage", timeLabel: "Switch time", itemLabel: "Disguise container", submissionHeading: "Explain the disappearance", resultVerb: "enabled the passenger's disappearance" },
+  { pattern: "contradiction", target: 1, caseType: "Cipher testimony · Murder", evidenceHeading: "Decoded testimony", evidenceIntro: "The decoded statements fix rooms and times. Cross them with the archive tools to expose the scholar who lied in plain sight.", personLabel: "The killer", placeLabel: "Crime room", timeLabel: "Time of death", itemLabel: "Murder weapon", submissionHeading: "Submit the decoded accusation", resultVerb: "committed the murder" },
+  { pattern: "trail", target: 3, caseType: "Evidence trail · Flood sabotage", evidenceHeading: "The waterline evidence", evidenceIntro: "Water moved downhill; people did not. Trace each dry object back to its station and owner.", personLabel: "The saboteur", placeLabel: "Valve station", timeLabel: "Release time", itemLabel: "Sabotage tool", submissionHeading: "Identify the saboteur", resultVerb: "released the observatory tanks" },
+  { pattern: "alibi", target: 0, caseType: "Bidder alibis · Jewel theft", evidenceHeading: "The recess alibis", evidenceIntro: "Bid records fix four movements. The missing jewel belongs to the one route the alibis cannot explain.", personLabel: "The thief", placeLabel: "Hiding place", timeLabel: "Theft time", itemLabel: "Stolen lot", submissionHeading: "Recover lot forty-seven", resultVerb: "stole lot forty-seven" },
+  { pattern: "contradiction", target: 2, caseType: "Signal contradiction · Staged disappearance", evidenceHeading: "The altered indicator board", evidenceIntro: "One signal was falsified. Reconstruct the true room and time records, then identify who made the house appear sealed.", personLabel: "The architect", placeLabel: "Staging room", timeLabel: "Signal-change time", itemLabel: "Altered signal", submissionHeading: "Unmask the staging", resultVerb: "staged the disappearance" },
+  { pattern: "trail", target: 4, caseType: "Final synthesis · Conspiracy", evidenceHeading: "Twenty echoes, twelve final clues", evidenceIntro: "Objects and methods from earlier cases return in new hands. Solve the trail first; only then decide whether the murders were connected.", personLabel: "The mastermind", placeLabel: "Final meeting place", timeLabel: "Reckoning time", itemLabel: "Linking evidence", submissionHeading: "Name the mastermind", resultVerb: "orchestrated the Wrenmere conspiracy" }
+];
+
+const STORY_UPDATES = {
+  3: "The Green Salon stood empty after the private rehearsal. Maestro Emil Hart and his Stradivarius had vanished, while a snapped ebony bow remained on the carpet. Five people crossed Harrowby Hall in a strict sequence. One of them helped Hart turn a theft into a disappearance.",
+  5: "Botanist Viola Ames collapsed beneath the blue orchid she had spent a decade cultivating, but prompt treatment saved her life. The specimen was unharmed; residue inside a heavy watering lance showed deliberate contamination. Five visitors had signed into separate glasshouse zones that evening.",
+  7: "Director Imogen Price was found unconscious behind the velvet curtain moments before the final rehearsal. An iron stage weight had been rigged to fall on the next cue. Five company members had moved through the darkened theatre on separate errands.",
+  9: "Postmaster Arthur Quill was struck beside the silent telegraph, but survived. The midnight message and a cast-iron date stamp had disappeared. Five late callers had each been admitted through a different office with a parcel or personal item.",
+  11: "During a private reception at the Alderwick Hotel, the ceremonial glass key vanished from its locked display. Every door on the mirrored floor remained secured. Five guests had used the private corridor during the same narrow interval.",
+  15: "Justice Halden vanished from the Nightingale Express moments before it reached Wrenmere. His compartment was locked from inside, yet a green hatbox appeared in the Brake Van. Five passengers were seen moving between the reserved carriages at recorded times.",
+  17: "The great telescope narrowly missed astronomer Celeste Orr when the hill's water tanks ruptured and the dome machinery failed. A brass counterweight had been moved deliberately. Five researchers occupied distinct stations during the final observations.",
+  18: "During the recess at Wrenmere Assembly Rooms, lot forty-seven—a celebrated black diamond—vanished before it reached the rostrum. Five registered bidders entered the staff corridor, each carrying an object recorded by the porter.",
+  19: "Recluse Marion Hush vanished from the Sound Room of her experimental silent house. Fresh snow surrounded the building, and the mechanical indicator board showed no exit. Five residents remained inside, but one signal had been altered."
+};
+
+const ANSWER_SLOTS = {
+  1: [3, 3, 3], 2: [3, 2, 3], 3: [3, 2, 3], 4: [3, 4, 1], 5: [3, 2, 3],
+  6: [3, 0, 3], 7: [3, 3, 3], 8: [3, 1, 1], 9: [3, 2, 1], 10: [3, 4, 3],
+  11: [3, 1, 3], 12: [3, 3, 4], 13: [3, 3, 3], 14: [3, 2, 1], 15: [3, 1, 4],
+  16: [3, 4, 3], 17: [4, 2, 3], 18: [4, 0, 4], 19: [3, 3, 1], 20: [3, 4, 2]
+};
+
+function forceSlot(order, personIndex, valueIndex) {
+  const adjusted = [...order];
+  const currentOwner = adjusted.indexOf(valueIndex);
+  [adjusted[personIndex], adjusted[currentOwner]] = [adjusted[currentOwner], adjusted[personIndex]];
+  return adjusted;
+}
+
+CASES.forEach((data, index) => {
+  const profile = CASE_PROFILES[index];
+  Object.assign(data, profile);
+  if (STORY_UPDATES[data.id]) data.story = STORY_UPDATES[data.id];
+  if (data.id === 18) data.items[4] = "Black diamond";
+  data.times = CASE_TIMES[index];
+  data.goal = `Reconstruct all five records, then identify ${data.personLabel.toLowerCase()} whose room, time, and object match the fixed evidence.`;
+  const pattern = SOLUTION_PATTERNS[profile.pattern];
+  const [answerRoom, answerTime, answerItem] = ANSWER_SLOTS[data.id];
+  const roomOrder = forceSlot(pattern.rooms, profile.target, answerRoom);
+  const timeOrder = forceSlot(pattern.times, profile.target, answerTime);
+  const itemOrder = forceSlot(pattern.items, profile.target, answerItem);
+  data.records = data.suspects.map((suspect, personIndex) => ({
+    person: suspect[0],
+    room: data.rooms[roomOrder[personIndex]],
+    time: data.times[timeOrder[personIndex]],
+    item: data.items[itemOrder[personIndex]]
+  }));
+  data.answer = data.records[profile.target];
+});
+
 function partFor(id) {
   return PARTS.findIndex(part => id >= part.range[0] && id <= part.range[1]);
 }
 
 function cluesFor(data) {
-  const [p0, p1, p2, p3, p4] = data.suspects.map(s => s[0]);
-  const [r0, r1, r2, r3, r4] = data.rooms;
-  const [i0, i1, i2, i3, i4] = data.items;
+  const records = data.records;
+  const firstFour = records.slice(0, 4);
+  const byTime = [...records].sort((a, b) => data.times.indexOf(a.time) - data.times.indexOf(b.time));
+  if (data.id === 1) return [
+    `The ${data.rooms[1]} was visited at 9:00 p.m.`,
+    `The ${data.rooms[2]} visit happened exactly ten minutes after the ${data.rooms[1]} visit.`,
+    `The ${data.rooms[3]} visit happened exactly ten minutes after the ${data.rooms[2]} visit.`,
+    `The ${data.rooms[4]} was the final room visited.`,
+    `The person carrying the ${data.items[2].toLowerCase()} was seen in the ${data.rooms[2]}.`,
+    `${data.suspects[2][0]} was carrying the ${data.items[2].toLowerCase()}.`,
+    `${data.suspects[3][0]} arrived exactly ten minutes after ${data.suspects[2][0]}.`,
+    `${data.suspects[4][0]} arrived later than ${data.suspects[3][0]}.`,
+    `${data.suspects[1][0]} arrived before ${data.suspects[2][0]}, but was not the first arrival.`,
+    `${data.suspects[0][0]} was carrying the ${data.items[0].toLowerCase()}.`,
+    `The ${data.items[1].toLowerCase()} was seen in the ${data.rooms[1]}.`,
+    `The ${data.items[4].toLowerCase()} was seen in the ${data.rooms[4]}.`
+  ];
+  if (data.pattern === "alibi") return [
+    ...firstFour.map((r, i) => `${r.person}'s signed alibi places ${i % 2 ? "them" : "that guest"} in the ${r.room} at ${r.time}`),
+    ...firstFour.map((r, i) => `${i % 2 ? "A porter recorded" : "The inventory lists"} the ${r.item.toLowerCase()} with ${r.person}.`),
+    `${byTime[4].person} was seen later than ${byTime[0].person}.`,
+    `The ${records[4].item.toLowerCase()} never entered the ${records[0].room}.`,
+    `The guest in the ${records[4].room} did not arrive at ${records[0].time}`,
+    `Only one unsigned alibi remains after the four register entries are placed.`
+  ];
+  if (data.pattern === "trail") return [
+    ...firstFour.map((r, i) => `Trace ${i + 1}: the ${r.item.toLowerCase()} was recovered in the ${r.room} after the ${r.time} visit.`),
+    ...firstFour.map((r, i) => `${r.person} ${i % 2 ? "admitted carrying" : "was witnessed with"} the ${r.item.toLowerCase()}.`),
+    `${byTime[4].person} arrived after ${byTime[0].person}.`,
+    `The final unclaimed object belongs to the final unassigned person.`,
+    `The ${records[4].room} was not visited at ${records[0].time}`,
+    `No two recovered objects came from the same room or time slot.`
+  ];
+  if (data.pattern === "sequence") return [
+    ...firstFour.map((r, i) => `${i === 0 ? "The opening record" : `Sequence ${i + 1}`} places ${r.person} at ${r.time}`),
+    ...byTime.slice(0, 4).map(r => `At ${r.time}, the movement log records the ${r.room}.`),
+    ...firstFour.map((r, i) => `${r.person} carried the ${r.item.toLowerCase()}${i === 3 ? " during the recorded movement" : ""}.`)
+  ];
+  if (data.pattern === "contradiction") return [
+    ...firstFour.map((r, i) => `Statement ${i + 1}: ${r.person} was in the ${r.room}.`),
+    ...firstFour.map((r, i) => `The verified timestamp for ${r.person} is ${r.time}`),
+    ...firstFour.map((r, i) => `The ${r.item.toLowerCase()} was logged in the ${r.room}.`)
+  ];
   return [
-    `The ${r1} was visited at 9:00 p.m.`,
-    `The ${r2} visit happened exactly ten minutes after the ${r1} visit.`,
-    `The ${r3} visit happened exactly ten minutes after the ${r2} visit.`,
-    `The ${r4} was the final room visited.`,
-    `The person carrying the ${i2.toLowerCase()} was seen in the ${r2}.`,
-    `${p2} was carrying the ${i2.toLowerCase()}.`,
-    `${p3} arrived exactly ten minutes after ${p2}.`,
-    `${p4} arrived later than ${p3}.`,
-    `${p1} arrived before ${p2}, but was not the first arrival.`,
-    `${p0} was carrying the ${i0.toLowerCase()}.`,
-    `The ${i1.toLowerCase()} was seen in the ${r1}.`,
-    `The ${i4.toLowerCase()} was seen in the ${r4}.`
+    ...byTime.slice(0, 4).map(r => `At ${r.time}, the recorded room was the ${r.room}.`),
+    ...firstFour.map(r => `${r.person} was carrying the ${r.item.toLowerCase()}.`),
+    ...firstFour.map(r => `${r.person} was the visitor seen in the ${r.room}.`)
   ];
 }
 
 function hintsFor(data) {
-  return [
+  const answer = data.answer;
+  if (data.id === 1) return [
     `Start with clues 1-4. They lock the five rooms into a complete chronological chain beginning with the ${data.rooms[0]}.`,
     `Combine clues 5 and 6 to place ${data.suspects[2][0]}. Then clue 7 places ${data.suspects[3][0]}.`,
     `Clues 8 and 9 settle the last two uncertain arrivals. The unused object at 9:20 is the weapon.`
   ];
+  const guides = {
+    classic: ["Begin with the four time-and-room records.", "Place the named people and their objects, then use one-per-row elimination.", `The decisive record is the visitor in the ${answer.room} at ${answer.time}`],
+    alibi: ["Treat the signed alibis as combined person-room-time facts.", "The inventory settles four person-object matches; the fifth follows by elimination.", `Compare the remaining record with the ${answer.item.toLowerCase()}.`],
+    trail: ["Place each recovered object with its room and time before assigning people.", "Use the four witnessed carriers to connect people to the object trail.", `Follow the trail that ends in the ${answer.room}.`],
+    sequence: ["Complete the person-by-time grid from the first four records.", "Transfer each time to its logged room, then add the carried objects.", `The critical step occurs at ${answer.time}`],
+    contradiction: ["Enter the four verified person-room statements first.", "Add the timestamps, then connect each logged room to its object.", `The unresolved record points to the ${answer.item.toLowerCase()}.`]
+  };
+  return guides[data.pattern];
 }
 
 const state = loadState();
@@ -222,7 +362,10 @@ let currentChapter = Math.min(20, Math.max(1, Number(location.hash.replace("#cha
 
 function loadState() {
   try {
-    return JSON.parse(localStorage.getItem("wrenmere-book-v1")) || { current: 1, chapters: {} };
+    const current = JSON.parse(localStorage.getItem("wrenmere-book-v2"));
+    if (current) return current;
+    const legacy = JSON.parse(localStorage.getItem("wrenmere-book-v1"));
+    return legacy ? { current: legacy.current || 1, chapters: legacy.chapters?.[1] ? { 1: legacy.chapters[1] } : {} } : { current: 1, chapters: {} };
   } catch {
     return { current: 1, chapters: {} };
   }
@@ -230,7 +373,7 @@ function loadState() {
 
 function saveState(message) {
   state.current = currentChapter;
-  localStorage.setItem("wrenmere-book-v1", JSON.stringify(state));
+  localStorage.setItem("wrenmere-book-v2", JSON.stringify(state));
   if (message) announce(message);
   updateProgress();
 }
@@ -326,14 +469,16 @@ function tutorialMarkup() {
 }
 
 function expandedSolutionMarkup(data) {
+  const answer = data.answer;
+  const timeline = [...data.records].sort((a, b) => data.times.indexOf(a.time) - data.times.indexOf(b.time));
   return `<div id="solution" class="solution expanded-solution ${chapterState(data.id).solved ? "" : "is-hidden"}">
     <p class="solution-label">Solution</p>
     <h4>${data.solutionHeading}</h4>
-    <p>${data.suspects[3][0]} was in the ${data.rooms[3]} at 9:20 p.m. carrying the ${data.items[3].toLowerCase()}. ${data.suspects[3][0]} killed ${data.victim}.</p>
+    <p>${answer.person} was in the ${answer.room} at ${answer.time} carrying the ${answer.item.toLowerCase()}. ${answer.person} ${data.resultVerb}.</p>
     <div class="timeline-scroll">
       <table class="timeline-table">
         <thead><tr><th scope="col">Time</th><th scope="col">Suspect</th><th scope="col">Room</th><th scope="col">Object</th></tr></thead>
-        <tbody>${data.suspects.map((suspect, index) => `<tr ${index === 3 ? 'class="culprit-row"' : ""}><td>${TIMES[index].replace(" p.m.", "")}</td><td>${suspect[0]}</td><td>${data.rooms[index]}</td><td>${data.items[index]}</td></tr>`).join("")}</tbody>
+        <tbody>${timeline.map(record => `<tr ${record.person === answer.person ? 'class="culprit-row"' : ""}><td>${record.time}</td><td>${record.person}</td><td>${record.room}</td><td>${record.item}</td></tr>`).join("")}</tbody>
       </table>
     </div>
     <h5>Deduction path</h5>
@@ -364,6 +509,7 @@ function renderChapter(id, focus = false) {
       <aside class="case-stamp" aria-label="Case details">
         <span>Case file ${String(id).padStart(3, "0")}</span>
         <strong>${data.setting}</strong>
+        <em>${data.caseType}</em>
         <small>${data.difficulty} · Approx. 20-35 minutes · Unique solution</small>
       </aside>
       <figure class="chapter-banner">
@@ -378,16 +524,16 @@ function renderChapter(id, focus = false) {
         <h4>Your assignment</h4>
         <p>Use the clues and grids to match every suspect with one room, one arrival time, and one object. Then name the killer. There is exactly one solution. If logic grids are new to you, complete the short practice file below before reading the case clues.</p>
         <dl class="case-reference">
-          <div><dt>Arrival times</dt><dd>${TIMES.join(" · ")}</dd></div>
+          <div><dt>Arrival times</dt><dd>${data.times.join(" · ")}</dd></div>
           <div><dt>Rooms</dt><dd>${data.rooms.join(" · ")}</dd></div>
           <div><dt>Objects</dt><dd>${data.items.join(" · ")}</dd></div>
         </dl>
         <div class="marking-guide"><h4>How to mark the grids</h4><p>Place an <strong>X</strong> where a pairing cannot be true. Place an <strong>O</strong> where a pairing must be true. Each row and column receives exactly one O. Carry confirmed matches across the other grids.</p><p><strong>Important:</strong> Times describe when each guest was seen entering a room, not how long the guest remained there.</p></div>
-      </div>` : `<p>Your task is to match every suspect with one room, one arrival time, and one object. The killer is the person in the crime room at 9:20 p.m. with the murder weapon.</p>`}
+      </div>` : `<p class="case-objective"><strong>Your brief:</strong> ${data.goal}</p>`}
       <div class="facts-grid">
-        <div class="fact"><span>Crime room</span><strong>${data.rooms[3]}</strong></div>
-        <div class="fact"><span>Time of death</span><strong>9:20 p.m.</strong></div>
-        <div class="fact"><span>Murder weapon</span><strong>${data.items[3]}</strong></div>
+        <div class="fact"><span>${data.placeLabel}</span><strong>${data.answer.room}</strong></div>
+        <div class="fact"><span>${data.timeLabel}</span><strong>${data.answer.time}</strong></div>
+        <div class="fact"><span>${data.itemLabel}</span><strong>${data.answer.item}</strong></div>
       </div>
     </section>
 
@@ -401,8 +547,8 @@ function renderChapter(id, focus = false) {
     </section>
 
     <section class="section" aria-labelledby="clues-title">
-      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "04" : "03"}</span><h3 id="clues-title">The twelve clues</h3></div>
-      ${isExpandedChapter ? `<p class="section-intro">Read carefully. The wording is exact: immediately before or after means a ten-minute difference.</p>` : ""}
+      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "04" : "03"}</span><h3 id="clues-title">${data.evidenceHeading}</h3></div>
+      <p class="section-intro">${isExpandedChapter ? "Read carefully. The wording is exact: immediately before or after means a ten-minute difference." : data.evidenceIntro}</p>
       <div class="clue-grid">${clues.map((clue, i) => `<article class="clue"><b>${i + 1}</b><p>${clue}</p></article>`).join("")}</div>
     </section>
 
@@ -411,28 +557,28 @@ function renderChapter(id, focus = false) {
       <div class="tool-intro"><p>Select a square to cycle between blank, X, and O. Your work is saved on this device.</p><button class="reset-button" id="reset-grid" type="button">Clear this case</button></div>
       <div class="grids">
         ${gridMarkup(id, "Suspects by room", data.suspects.map(s => s[0]), data.rooms, "people-rooms")}
-        ${gridMarkup(id, "Suspects by time", data.suspects.map(s => s[0]), TIMES, "people-times")}
+        ${gridMarkup(id, "Suspects by time", data.suspects.map(s => s[0]), data.times, "people-times")}
         ${gridMarkup(id, "Suspects by object", data.suspects.map(s => s[0]), data.items, "people-items")}
         ${gridMarkup(id, "Rooms by object", data.rooms, data.items, "rooms-items")}
       </div>
     </section>
 
     <section class="section" aria-labelledby="accuse-title">
-      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "06" : "05"}</span><h3 id="accuse-title">Make your accusation</h3></div>
+      <div class="section-heading"><span class="section-index">${isExpandedChapter ? "06" : "05"}</span><h3 id="accuse-title">${data.submissionHeading}</h3></div>
       <div class="accusation-layout">
         <form id="accusation-form" class="accusation-form">
           <div class="field-grid">
-            <div class="field"><label for="accuse-person">The killer</label><select id="accuse-person">${optionList(data.suspects.map(s => s[0]), "a suspect")}</select></div>
-            <div class="field"><label for="accuse-room">The room</label><select id="accuse-room">${optionList(data.rooms, "a room")}</select></div>
-            <div class="field"><label for="accuse-time">The time</label><select id="accuse-time">${optionList(TIMES, "a time")}</select></div>
-            <div class="field"><label for="accuse-item">The weapon</label><select id="accuse-item">${optionList(data.items, "an object")}</select></div>
+            <div class="field"><label for="accuse-person">${data.personLabel}</label><select id="accuse-person">${optionList(data.suspects.map(s => s[0]), "a person")}</select></div>
+            <div class="field"><label for="accuse-room">${data.placeLabel}</label><select id="accuse-room">${optionList(data.rooms, "a room")}</select></div>
+            <div class="field"><label for="accuse-time">${data.timeLabel}</label><select id="accuse-time">${optionList(data.times, "a time")}</select></div>
+            <div class="field"><label for="accuse-item">${data.itemLabel}</label><select id="accuse-item">${optionList(data.items, "an object")}</select></div>
           </div>
           ${isExpandedChapter ? `<div class="reasoning-field"><label for="reasoning">Explain your reasoning</label><textarea id="reasoning" rows="6" placeholder="Which clues fixed the timeline? What eliminated the other suspects?">${escapeHTML(cState.reasoning || "")}</textarea><span>Your notes are saved on this device.</span></div>` : ""}
-          <div class="form-actions"><button class="secondary-button" type="submit">Check accusation</button><button class="outline-button" id="reveal-answer" type="button">Reveal after an attempt</button></div>
+          <div class="form-actions"><button class="secondary-button" type="submit">Check finding</button><button class="outline-button" id="reveal-answer" type="button">Reveal after an attempt</button></div>
           <p id="feedback" class="feedback" role="status"></p>
           ${isExpandedChapter ? expandedSolutionMarkup(data) : `<div id="solution" class="solution ${cState.solved ? "" : "is-hidden"}">
-            <h4>${data.suspects[3][0]} committed the murder.</h4>
-            <p>${data.suspects[3][0]} was in the ${data.rooms[3]} at 9:20 p.m. carrying the ${data.items[3].toLowerCase()}. The full timeline is ${data.suspects.map((s, i) => `${TIMES[i].replace(" p.m.", "")}: ${s[0]} in the ${data.rooms[i]} with the ${data.items[i].toLowerCase()}`).join("; ")}.</p>
+            <h4>${data.personLabel}: ${data.answer.person}</h4>
+            <p>${data.answer.person} was in the ${data.answer.room} at ${data.answer.time} carrying the ${data.answer.item.toLowerCase()}, and ${data.resultVerb}. The full reconstruction is ${[...data.records].sort((a, b) => data.times.indexOf(a.time) - data.times.indexOf(b.time)).map(record => `${record.time}: ${record.person} in the ${record.room} with the ${record.item.toLowerCase()}`).join("; ")}.</p>
           </div>`}
         </form>
         <aside class="hints">
@@ -537,18 +683,18 @@ function bindChapterEvents(data) {
 
   document.getElementById("accusation-form").addEventListener("submit", event => {
     event.preventDefault();
-    const answer = [data.suspects[3][0], data.rooms[3], TIMES[3], data.items[3]];
+    const answer = [data.answer.person, data.answer.room, data.answer.time, data.answer.item];
     const guess = ["accuse-person", "accuse-room", "accuse-time", "accuse-item"].map(id => document.getElementById(id).value);
     const feedback = document.getElementById("feedback");
     const cState = chapterState(currentChapter);
     cState.attempts = (cState.attempts || 0) + 1;
     if (guess.some(x => !x)) {
       feedback.className = "feedback error";
-      feedback.textContent = "Complete all four fields before checking your accusation.";
+      feedback.textContent = "Complete all four fields before checking your finding.";
     } else if (guess.every((value, i) => value === answer[i])) {
       cState.solved = true;
       feedback.className = "feedback success";
-      feedback.textContent = "Case closed. Every part of your accusation is correct.";
+      feedback.textContent = "Case closed. Every part of your finding is correct.";
       document.getElementById("solution").classList.remove("is-hidden");
       document.querySelector(".case-complete").textContent = "Case solved";
       announce(`Chapter ${currentChapter} solved.`);
@@ -566,7 +712,7 @@ function bindChapterEvents(data) {
     const feedback = document.getElementById("feedback");
     if (!cState.attempts) {
       feedback.className = "feedback error";
-      feedback.textContent = "Commit to an accusation first. The solution unlocks after one attempt.";
+      feedback.textContent = "Commit to a finding first. The solution unlocks after one attempt.";
       return;
     }
     cState.solved = true;
