@@ -12,8 +12,10 @@
   --stone: #d7d1c5;
   --coral: #ad5147;
   --shadow: 0 22px 70px rgba(8, 42, 61, .14);
-  --serif: Georgia, 'Times New Roman', serif;
-  --sans: Carlito, 'Trebuchet MS', Arial, sans-serif;
+  --display: 'Outfit', 'Trebuchet MS', Arial, sans-serif;
+  --body: 'Nunito', Arial, sans-serif;
+  --serif: var(--display);
+  --sans: var(--body);
 }
 
 * { box-sizing: border-box; }
@@ -90,9 +92,9 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   color: var(--ivory);
   font-family: var(--serif);
   font-size: clamp(4rem, 9vw, 8.7rem);
-  font-weight: 700;
-  letter-spacing: -.055em;
-  line-height: .78;
+  font-weight: 800;
+  letter-spacing: -.065em;
+  line-height: .82;
   text-shadow: 0 10px 36px rgba(0,0,0,.45);
 }
 .cover h1 span { color: var(--harvest); }
@@ -102,6 +104,8 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   color: #e9e5d9;
   font-family: var(--serif);
   font-size: clamp(1.12rem, 1rem + .4vw, 1.45rem);
+  font-weight: 500;
+  letter-spacing: -.015em;
   line-height: 1.4;
 }
 .author-label {
@@ -259,11 +263,12 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   color: var(--ink);
   font-family: var(--serif);
   font-size: clamp(3.1rem, 5vw, 5.7rem);
-  letter-spacing: -.055em;
-  line-height: .88;
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: .92;
   overflow-wrap: normal;
 }
-.chapter-deck { max-width: 48rem; margin: 1.25rem 0 0; color: #505a58; font-family: var(--serif); font-size: clamp(1.05rem, 1rem + .25vw, 1.25rem); line-height: 1.55; }
+.chapter-deck { max-width: 48rem; margin: 1.25rem 0 0; color: #505a58; font-family: var(--serif); font-size: clamp(1.05rem, 1rem + .25vw, 1.25rem); font-weight: 500; letter-spacing: -.01em; line-height: 1.55; }
 .case-stamp { align-self: stretch; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem; border: 1px solid var(--stone); border-top: 7px solid var(--olive); background: var(--paper); box-shadow: 0 14px 45px rgba(8,42,61,.08); }
 .case-stamp span { color: var(--deep-olive); font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .case-stamp strong { margin-top: .25rem; color: var(--ink); font-family: var(--serif); font-size: 1.35rem; }
@@ -284,11 +289,11 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 .case-reference > div { display: grid; grid-template-columns: 9.5rem 1fr; border-bottom: 1px solid var(--stone); }
 .case-reference > div:last-child { border-bottom: 0; }
 .case-reference dt { padding: .75rem .85rem; background: var(--ink); color: white; font-size: .78rem; font-weight: 900; letter-spacing: .04em; }
-.case-reference dd { margin: 0; padding: .75rem .85rem; color: var(--charcoal); font-family: var(--serif); font-size: .92rem; line-height: 1.45; }
+.case-reference dd { margin: 0; padding: .75rem .85rem; color: var(--charcoal); font-family: var(--body); font-size: .92rem; line-height: 1.45; }
 .marking-guide { margin-top: 1.25rem; padding-left: 1.15rem; border-left: 5px solid var(--olive); }
 .marking-guide p { margin: .35rem 0 0; }
 .marking-guide p:last-child { color: #555d59; font-size: .91rem; font-style: italic; }
-.tutorial-lead { max-width: 74ch; margin: 0 0 1.5rem; color: #414a47; font-family: var(--serif); font-size: 1.08rem; }
+.tutorial-lead { max-width: 74ch; margin: 0 0 1.5rem; color: #414a47; font-family: var(--body); font-size: 1.08rem; }
 .play-loop { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin: 0; padding: 1px; background: var(--stone); list-style: none; }
 .play-loop li { display: grid; grid-template-columns: 2rem 1fr; gap: .7rem; align-content: start; min-width: 0; padding: 1rem; background: var(--paper); }
 .play-loop li > span { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--ink); color: var(--harvest); font-family: var(--serif); font-weight: 900; }
@@ -303,7 +308,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 .practice-copy h4 { margin: 0; color: white; font-family: var(--serif); font-size: 1.55rem; line-height: 1.1; }
 .practice-copy > p { margin: .75rem 0 0; font-size: .9rem; line-height: 1.5; }
 .practice-clues { margin: 1rem 0 0; padding-left: 1.35rem; }
-.practice-clues li { margin: .45rem 0; font-family: var(--serif); font-size: .92rem; line-height: 1.4; }
+.practice-clues li { margin: .45rem 0; font-family: var(--body); font-size: .92rem; line-height: 1.4; }
 .practice-copy .practice-tip { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.18); color: #d7ddd2; font-size: .82rem; }
 .practice-workspace { min-width: 0; padding: clamp(1rem, 3vw, 1.5rem); background: var(--paper); }
 .practice-grid-scroll { max-width: 100%; overflow-x: auto; }
@@ -327,7 +332,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 .deduction-example strong { color: var(--ink); font-family: var(--serif); }
 .deduction-example i { color: var(--deep-amber); font-style: normal; font-weight: 900; }
 .deduction-example p { flex-basis: 100%; margin: .15rem 0 0; color: #555d59; font-size: .87rem; }
-.section-intro { max-width: 72ch; margin: -.2rem 0 1.1rem; color: #515b58; font-family: var(--serif); }
+.section-intro { max-width: 72ch; margin: -.2rem 0 1.1rem; color: #515b58; font-family: var(--body); }
 .cast-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .8rem; }
 .suspect-card { position: relative; min-height: 160px; padding: 1.1rem; border: 1px solid var(--stone); background: var(--paper); }
 .suspect-card::before { content: attr(data-initials); display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 1.3rem; border-radius: 50%; background: var(--mist); color: var(--deep-olive); font-family: var(--serif); font-weight: 900; }
@@ -344,12 +349,12 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 .cast-table tbody tr:nth-child(even) > * { background: #eef0e6; }
 .inspector-note { margin-top: 1.25rem; padding: 1.15rem 1.25rem; border-left: 6px solid var(--amber); background: #f3ead8; }
 .inspector-note span { color: var(--deep-amber); font-size: .75rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
-.inspector-note p { max-width: 72ch; margin: .3rem 0 0; font-family: var(--serif); }
+.inspector-note p { max-width: 72ch; margin: .3rem 0 0; font-family: var(--body); }
 .clue-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--stone); border-left: 1px solid var(--stone); }
 .clue { display: grid; grid-template-columns: 2.2rem 1fr; gap: .5rem; min-height: 104px; padding: 1rem; border-right: 1px solid var(--stone); border-bottom: 1px solid var(--stone); background: var(--paper); }
 .clue:nth-child(4n+2), .clue:nth-child(4n+3) { background: #f1f1e7; }
 .clue b { color: var(--deep-amber); font-family: var(--serif); font-size: 1.1rem; }
-.clue p { margin: 0; font-family: var(--serif); font-size: .98rem; line-height: 1.45; }
+.clue p { margin: 0; font-family: var(--body); font-size: .98rem; line-height: 1.45; }
 .tool-intro { display: flex; justify-content: space-between; gap: 1rem; align-items: center; margin-bottom: 1rem; }
 .tool-intro p { margin: 0; color: #59635f; }
 .reset-button { min-height: 44px; border: 1px solid var(--stone); background: var(--paper); color: var(--deep-amber); padding: .45rem .8rem; font-weight: 900; }
