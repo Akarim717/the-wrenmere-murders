@@ -285,6 +285,45 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 .marking-guide { margin-top: 1.25rem; padding-left: 1.15rem; border-left: 5px solid var(--olive); }
 .marking-guide p { margin: .35rem 0 0; }
 .marking-guide p:last-child { color: #555d59; font-size: .91rem; font-style: italic; }
+.tutorial-lead { max-width: 74ch; margin: 0 0 1.5rem; color: #414a47; font-family: var(--serif); font-size: 1.08rem; }
+.play-loop { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin: 0; padding: 1px; background: var(--stone); list-style: none; }
+.play-loop li { display: grid; grid-template-columns: 2rem 1fr; gap: .7rem; align-content: start; min-width: 0; padding: 1rem; background: var(--paper); }
+.play-loop li > span { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--ink); color: var(--harvest); font-family: var(--serif); font-weight: 900; }
+.play-loop strong { color: var(--ink); font-family: var(--serif); font-size: .98rem; line-height: 1.2; }
+.play-loop p { margin: .35rem 0 0; color: #5a6460; font-size: .8rem; line-height: 1.45; }
+.mark-sample { display: inline-grid; place-items: center; width: 1.45rem; height: 1.45rem; margin: 0 .1rem; border: 1px solid var(--stone); font-family: var(--sans); font-style: normal; }
+.mark-o { background: #f3d99c; color: var(--ink); }
+.mark-x { background: #eeeae1; color: #68706d; }
+.practice-panel { display: grid; grid-template-columns: minmax(240px, .75fr) minmax(0, 1.25fr); margin-top: 1.5rem; background: var(--ink); box-shadow: var(--shadow); }
+.practice-copy { padding: clamp(1.25rem, 3vw, 2rem); color: #edf0e8; }
+.practice-kicker { margin: 0 0 .25rem; color: var(--harvest); font-size: .72rem; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.practice-copy h4 { margin: 0; color: white; font-family: var(--serif); font-size: 1.55rem; line-height: 1.1; }
+.practice-copy > p { margin: .75rem 0 0; font-size: .9rem; line-height: 1.5; }
+.practice-clues { margin: 1rem 0 0; padding-left: 1.35rem; }
+.practice-clues li { margin: .45rem 0; font-family: var(--serif); font-size: .92rem; line-height: 1.4; }
+.practice-copy .practice-tip { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.18); color: #d7ddd2; font-size: .82rem; }
+.practice-workspace { min-width: 0; padding: clamp(1rem, 3vw, 1.5rem); background: var(--paper); }
+.practice-grid-scroll { max-width: 100%; overflow-x: auto; }
+.practice-grid { width: 100%; min-width: 430px; border-collapse: collapse; table-layout: fixed; font-size: .79rem; line-height: 1.15; }
+.practice-grid th, .practice-grid td { height: 54px; border: 1px solid #bfc5bc; text-align: center; }
+.practice-grid thead th { background: var(--olive); color: white; padding: .35rem; }
+.practice-grid thead th:first-child { width: 31%; background: var(--ink); }
+.practice-grid tbody th { background: var(--mist); color: var(--ink); padding: .35rem .5rem; text-align: left; }
+.practice-cell { width: 100%; height: 100%; border: 0; background: white; color: var(--ink); font-size: 1.25rem; font-weight: 900; }
+.practice-cell:hover { background: #f5edda; }
+.practice-cell[data-state="x"] { background: #eeeae1; color: #68706d; }
+.practice-cell[data-state="o"] { background: #f3d99c; color: var(--ink); box-shadow: inset 0 0 0 2px var(--amber); }
+.practice-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+.practice-actions .secondary-button, .practice-actions .outline-button { min-height: 44px; padding: .55rem .8rem; font-size: .82rem; }
+.text-button { min-height: 44px; border: 0; background: transparent; color: var(--deep-amber); padding: .45rem .35rem; font-size: .82rem; font-weight: 900; }
+.practice-feedback { min-height: 1.7rem; margin: .8rem 0 0; color: #5e6763; font-size: .84rem; font-weight: 800; }
+.practice-feedback.success { color: var(--deep-olive); }
+.practice-feedback.error { color: var(--coral); }
+.deduction-example { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; margin-top: 1.25rem; padding: 1rem 1.15rem; border-left: 6px solid var(--amber); background: #f3ead8; }
+.deduction-example > span { flex-basis: 100%; color: var(--deep-amber); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.deduction-example strong { color: var(--ink); font-family: var(--serif); }
+.deduction-example i { color: var(--deep-amber); font-style: normal; font-weight: 900; }
+.deduction-example p { flex-basis: 100%; margin: .15rem 0 0; color: #555d59; font-size: .87rem; }
 .section-intro { max-width: 72ch; margin: -.2rem 0 1.1rem; color: #515b58; font-family: var(--serif); }
 .cast-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .8rem; }
 .suspect-card { position: relative; min-height: 160px; padding: 1.1rem; border: 1px solid var(--stone); background: var(--paper); }
@@ -368,6 +407,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 
 @media (max-width: 1100px) {
   .cast-grid { grid-template-columns: repeat(3, 1fr); }
+  .play-loop { grid-template-columns: repeat(3, 1fr); }
   .grids { grid-template-columns: 1fr; }
 }
 
@@ -380,6 +420,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   .facts-grid { grid-template-columns: 1fr; }
   .fact { min-height: 0; }
   .cast-grid { grid-template-columns: 1fr 1fr; }
+  .practice-panel { grid-template-columns: 1fr; }
   .accusation-layout { grid-template-columns: 1fr; }
   .cover-folio { display: none; }
 }
@@ -392,6 +433,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
   .chapter { padding: 2rem 1rem 4rem; }
   .chapter h2 { font-size: clamp(3rem, 15vw, 5rem); }
   .cast-grid, .clue-grid, .field-grid { grid-template-columns: 1fr; }
+  .play-loop { grid-template-columns: 1fr; }
   .case-reference > div { grid-template-columns: 1fr; }
   .case-reference dt { padding-bottom: .45rem; }
   .case-reference dd { padding-top: .55rem; }
@@ -407,7 +449,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:f
 
 @media print {
   body { background: white; color: black; font-size: 11pt; }
-  .cover, .sidebar, .topbar, .tool-intro, .chapter-footer, .hints, .form-actions { display: none !important; }
+  .cover, .sidebar, .topbar, .tool-intro, .chapter-footer, .hints, .form-actions, .practice-actions { display: none !important; }
   .book-shell, .reading-shell { display: block !important; margin: 0; }
   .chapter { max-width: none; padding: 0; }
   .section { margin-top: 1.5rem; break-inside: avoid; }
